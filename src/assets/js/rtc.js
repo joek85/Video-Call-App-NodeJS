@@ -325,7 +325,7 @@ window.addEventListener( 'load', () => {
 
         function startRecording( stream ) {
             mediaRecorder = new MediaRecorder( stream, {
-                mimeType: 'video/webm;codecs=vp9'
+                mimeType: 'video/webm;'
             } );
 
             mediaRecorder.start( 1000 );
