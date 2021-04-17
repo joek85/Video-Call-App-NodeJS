@@ -24,3 +24,7 @@ node_modules/
 # dotenv environment variables file
 .env
 .env.test
+.idea/Video-Call-App-NodeJS.iml
+.idea/inspectionProfiles/
+.idea/modules.xml
+.idea/workspace.xml

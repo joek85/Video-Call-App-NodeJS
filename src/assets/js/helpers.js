@@ -2,7 +2,7 @@ export default {
     generateRandomString() {
         const crypto = window.crypto || window.msCrypto;
         let array = new Uint32Array(1);
-        
+
         return crypto.getRandomValues(array);
     },
 
@@ -268,23 +268,24 @@ export default {
     adjustVideoElemSize() {
         let elem = document.getElementsByClassName( 'card' );
         let totalRemoteVideosDesktop = elem.length;
-        let newWidth = totalRemoteVideosDesktop <= 2 ? '50%' : (
-            totalRemoteVideosDesktop == 3 ? '33.33%' : (
-                totalRemoteVideosDesktop <= 8 ? '25%' : (
-                    totalRemoteVideosDesktop <= 15 ? '20%' : (
-                        totalRemoteVideosDesktop <= 18 ? '16%' : (
-                            totalRemoteVideosDesktop <= 23 ? '15%' : (
-                                totalRemoteVideosDesktop <= 32 ? '12%' : '10%'
-                            )
-                        )
-                    )
-                )
-            )
-        );
+        // let newWidth = totalRemoteVideosDesktop <= 2 ? '25%' : (
+        //     totalRemoteVideosDesktop == 3 ? '33.33%' : (
+        //         totalRemoteVideosDesktop <= 8 ? '25%' : (
+        //             totalRemoteVideosDesktop <= 15 ? '20%' : (
+        //                 totalRemoteVideosDesktop <= 18 ? '16%' : (
+        //                     totalRemoteVideosDesktop <= 23 ? '15%' : (
+        //                         totalRemoteVideosDesktop <= 32 ? '12%' : '10%'
+        //                     )
+        //                 )
+        //             )
+        //         )
+        //     )
+        // );
 
-
+        let newWidth = '25%';
         for ( let i = 0; i < totalRemoteVideosDesktop; i++ ) {
             elem[i].style.width = newWidth;
+            elem[i].style.height = '20%';
         }
     },
 

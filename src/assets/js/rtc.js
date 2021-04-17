@@ -3,7 +3,7 @@
  * @date 6th January, 2020
  */
 import h from './helpers.js';
-
+import rec from './record.js';
 window.addEventListener( 'load', () => {
     const room = h.getQString( location.href, 'room' );
     const username = sessionStorage.getItem( 'username' );
@@ -32,7 +32,9 @@ window.addEventListener( 'load', () => {
         var screen = '';
         var recordedStream = [];
         var mediaRecorder = '';
-
+        let videoStreams = [];
+        var multiStreamRecorder;
+        multiStreamRecorder = new MultiStreamRecorder(videoStreams);
         //Get user video by default
         getAndSetUserStream();
 
@@ -187,17 +189,30 @@ window.addEventListener( 'load', () => {
             //add
             pc[partnerName].ontrack = ( e ) => {
                 let str = e.streams[0];
+                videoStreams.push(str);
+                multiStreamRecorder.addStream(str);
+                //multiStreamRecorder.stream = str;
+
                 if ( document.getElementById( `${ partnerName }-video` ) ) {
-                    document.getElementById( `${ partnerName }-video` ).srcObject = str;
+                    multiStreamRecorder.previewStream = function(stream) {
+                        document.getElementById( `${ partnerName }-video` ).srcObject = stream;
+                        document.getElementById( `${ partnerName }-video` ).srcObject.play();
+                    };
+                    // document.getElementById( `${ partnerName }-video` ).srcObject = str;
                 }
 
                 else {
                     //video elem
                     let newVid = document.createElement( 'video' );
                     newVid.id = `${ partnerName }-video`;
-                    newVid.srcObject = str;
-                    newVid.autoplay = true;
+                    // newVid.srcObject = str;
+                    // newVid.autoplay = true;
                     newVid.className = 'remote-video';
+
+                    multiStreamRecorder.previewStream = function(stream) {
+                        newVid.srcObject = stream;
+                        newVid.play();
+                    };
 
                     //video controls elements
                     let controlDiv = document.createElement( 'div' );
@@ -216,11 +231,23 @@ window.addEventListener( 'load', () => {
                     document.getElementById( 'videos' ).appendChild( cardDiv );
 
                     h.adjustVideoElemSize();
+                    multiStreamRecorder.start('1000');
                 }
             };
 
-
-
+            multiStreamRecorder.ondataavailable = function(blob) {
+                appendLink(blob);
+            };
+            function appendLink(blob) {
+                recordedStream.push( blob );
+            }
+            multiStreamRecorder.onstop = function (blob) {
+                console.log('stop')
+                h.saveRecordedStream(recordedStream, username)
+            };
+            function stopz() {
+                multiStreamRecorder.save();
+            }
             pc[partnerName].onconnectionstatechange = ( d ) => {
                 switch ( pc[partnerName].iceConnectionState ) {
                     case 'disconnected':
@@ -313,6 +340,13 @@ window.addEventListener( 'load', () => {
                 e.setAttribute( 'title', 'Stop recording' );
                 e.children[0].classList.add( 'text-danger' );
                 e.children[0].classList.remove( 'text-white' );
+                try {
+
+                    multiStreamRecorder.stop()
+                } catch (err) {
+                    throw err;
+                }
+
             }
 
             else {
@@ -324,30 +358,30 @@ window.addEventListener( 'load', () => {
 
 
         function startRecording( stream ) {
-            mediaRecorder = new MediaRecorder( stream, {
-                mimeType: 'video/webm;'
-            } );
-
-            mediaRecorder.start( 1000 );
+            // mediaRecorder = new MediaRecorder( stream, {
+            //     mimeType: 'video/webm;'
+            // } );
+            //
+            // mediaRecorder.start( 1000 );
             toggleRecordingIcons( true );
 
-            mediaRecorder.ondataavailable = function ( e ) {
-                recordedStream.push( e.data );
-            };
+            // mediaRecorder.ondataavailable = function ( e ) {
+            //     recordedStream.push( e.data );
+            // };
 
-            mediaRecorder.onstop = function () {
+            // mediaRecorder.onstop = function () {
                 toggleRecordingIcons( false );
+            //
+            //     h.saveRecordedStream( recordedStream, username );
+            //
+            //     setTimeout( () => {
+            //         recordedStream = [];
+            //     }, 3000 );
+            // };
 
-                h.saveRecordedStream( recordedStream, username );
-
-                setTimeout( () => {
-                    recordedStream = [];
-                }, 3000 );
-            };
-
-            mediaRecorder.onerror = function ( e ) {
-                console.error( e );
-            };
+            // mediaRecorder.onerror = function ( e ) {
+            //     console.error( e );
+            // };
         }
 
 
